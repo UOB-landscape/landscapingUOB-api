@@ -5,11 +5,20 @@ const path = require('path');
 
 // Load both sheets from the Excel file
 const workbook = xlsx.readFile(path.join(__dirname, '../data/Indoor plants (1).xlsx'));
-const sheetNames = workbook.SheetNames;
+const sheet1 = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+const sheet2 = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]]);
 
-const indoorData = sheetNames.flatMap(sheetName =>
-  xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
-);
+// Create a lookup map from Sheet 1
+const plantDefinitions = {};
+sheet1.forEach(p => {
+  plantDefinitions[p['Plant ID']] = p;
+});
+
+// Merge Sheet 2 with definitions from Sheet 1
+const indoorData = sheet2.map(p => ({
+  ...plantDefinitions[p['Plant ID']],
+  ...p
+}));
 
 // Helper: sort by field
 const sortByField = (data, field, direction = 'asc') => {
