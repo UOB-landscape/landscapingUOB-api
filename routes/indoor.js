@@ -14,10 +14,32 @@ sheet1.forEach(p => {
   plantDefinitions[p['Plant ID']] = p;
 });
 
-// Merge Sheet 2 with definitions from Sheet 1
-const indoorData = sheet2.map(p => ({
-  ...plantDefinitions[p['Plant ID']],
-  ...p
+// Aggregate quantity and location info from Sheet 2
+const placementMap = {};
+sheet2.forEach(p => {
+  const id = p['Plant ID'];
+  const qty = parseInt(p['Quantity'], 10) || 0;
+
+  if (!placementMap[id]) {
+    placementMap[id] = {
+      Quantity: 0,
+      Locations: []
+    };
+  }
+
+  placementMap[id].Quantity += qty;
+  placementMap[id].Locations.push({
+    'Location Number': p['Location Number'],
+    'Location name': p['Location name'],
+    'Quantity': qty
+  });
+});
+
+// Final indoor data: one row per plant, enriched with total quantity and locations
+const indoorData = Object.entries(plantDefinitions).map(([id, def]) => ({
+  ...def,
+  Quantity: placementMap[id]?.Quantity || 0,
+  Locations: placementMap[id]?.Locations || []
 }));
 
 // Helper: sort by field

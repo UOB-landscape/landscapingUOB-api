@@ -44,9 +44,9 @@ router.get('/', (req, res) => {
   // Sort by location number
   const sortParam = req.query.sort;
   if (sortParam === 'location_asc') {
-    result = sortByField(result, 'Location number', 'asc');
+    result = sortByField(result, 'Location Number', 'asc');
   } else if (sortParam === 'location_desc') {
-    result = sortByField(result, 'Location number', 'desc');
+    result = sortByField(result, 'Location Number', 'desc');
   }
 
   res.json(result);
@@ -73,7 +73,7 @@ router.get('/:locationNumber/indoor-plants', (req, res) => {
   const locationNumber = req.params.locationNumber;
 
   const filtered = sheet2
-    .filter(p => p['Location number'] === locationNumber)
+    .filter(p => p['Location Number'] === locationNumber)
     .map(p => ({
       ...plantDefinitions[p['Plant ID']],
       ...p
