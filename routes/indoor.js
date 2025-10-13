@@ -29,7 +29,7 @@ sheet2.forEach(p => {
 
   placementMap[id].Quantity += qty;
   placementMap[id].Locations.push({
-    'Location Number': p['Location Number'],
+    'Location number': p['Location number'],
     'Location name': p['Location name'],
     'Quantity': qty
   });
