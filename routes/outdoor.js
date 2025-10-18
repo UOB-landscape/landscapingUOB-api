@@ -3,13 +3,10 @@ const router = express.Router();
 const xlsx = require('xlsx');
 const path = require('path');
 
-// Load both sheets from the Excel file
+// Load only the first sheet from the Excel file
 const workbook = xlsx.readFile(path.join(__dirname, '../data/Outdoor plants (2).xlsx'));
-const sheetNames = workbook.SheetNames;
-
-const outdoorData = sheetNames.flatMap(sheetName =>
-  xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
-);
+const firstSheetName = workbook.SheetNames[0];
+const outdoorData = xlsx.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
 
 // Helper: sort by field
 const sortByField = (data, field, direction = 'asc') => {
