@@ -13,6 +13,10 @@ app.use('/api/outdoor-plants', require('./routes/outdoor'));
 app.use('/api/locations', require('./routes/locations'));
 app.use('/api/creators', require('./routes/creators'));
 app.use('/api/proposals', require('./routes/proposals'));
+app.use('/api/before-after', require('./routes/BeforeAndAfter'));
+
+// Report images route
+app.use('/api/reportImages', require('./routes/reportImages'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
