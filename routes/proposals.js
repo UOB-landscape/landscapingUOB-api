@@ -3,8 +3,8 @@ const router = express.Router();
 const xlsx = require('xlsx');
 const path = require('path');
 
-// Load all sheets from Proposals (2).xlsx
-const workbook = xlsx.readFile(path.join(__dirname, '../data/Proposals (2).xlsx'));
+// Load all sheets from Proposals.xlsx
+const workbook = xlsx.readFile(path.join(__dirname, '../data/Proposals.xlsx'));
 const sheetNames = workbook.SheetNames;
 
 const proposalsData = sheetNames.flatMap(sheetName =>

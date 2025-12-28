@@ -3,7 +3,7 @@ const router = express.Router();
 const xlsx = require('xlsx');
 const path = require('path');
 
-// Load all sheets from the Excel file
+// Load all sheets from the Locations Excel file
 const workbook = xlsx.readFile(path.join(__dirname, '../data/Locations 1 (3).xlsx'));
 const sheetNames = workbook.SheetNames;
 
@@ -13,15 +13,24 @@ const locationData = sheetNames.flatMap(sheetName =>
 
 // Load both sheets from Indoor plants file
 const indoorWorkbook = xlsx.readFile(path.join(__dirname, '../data/Indoor plants (1).xlsx'));
-const sheet1 = xlsx.utils.sheet_to_json(indoorWorkbook.Sheets[indoorWorkbook.SheetNames[0]]);
-const sheet2 = xlsx.utils.sheet_to_json(indoorWorkbook.Sheets[indoorWorkbook.SheetNames[1]]);
+const indoorSheet1 = xlsx.utils.sheet_to_json(indoorWorkbook.Sheets[indoorWorkbook.SheetNames[0]]);
+const indoorSheet2 = xlsx.utils.sheet_to_json(indoorWorkbook.Sheets[indoorWorkbook.SheetNames[1]]);
 
-// Create a lookup map from Sheet 1
-const plantDefinitions = {};
-sheet1.forEach(p => {
-  plantDefinitions[p['Plant ID']] = p;
+// Load both sheets from Outdoor plants file
+const outdoorWorkbook = xlsx.readFile(path.join(__dirname, '../data/Outdoor plants (2).xlsx'));
+const outdoorSheet1 = xlsx.utils.sheet_to_json(outdoorWorkbook.Sheets[outdoorWorkbook.SheetNames[0]]);
+const outdoorSheet2 = xlsx.utils.sheet_to_json(outdoorWorkbook.Sheets[outdoorWorkbook.SheetNames[1]]);
+
+// Create lookup maps for plant definitions
+const indoorPlantDefinitions = {};
+indoorSheet1.forEach(p => {
+  indoorPlantDefinitions[p['Plant ID']] = p;
 });
 
+const outdoorPlantDefinitions = {};
+outdoorSheet1.forEach(p => {
+  outdoorPlantDefinitions[p['Plant ID']] = p;
+});
 
 // Helper: sort by field
 const sortByField = (data, field, direction = 'asc') => {
@@ -52,6 +61,60 @@ router.get('/', (req, res) => {
   res.json(result);
 });
 
+// GET /api/locations/:locationNumber/indoor-plants
+router.get('/:locationNumber/indoor-plants', (req, res) => {
+  const locationNumber = req.params.locationNumber;
+
+  // Filter location entries for this specific location
+  const locationsForPlants = indoorSheet2.filter(p => p['Location number'] === locationNumber);
+
+  // Get unique plant IDs
+  const plantIds = [...new Set(locationsForPlants.map(p => p['Plant ID']))];
+
+  // Get full plant data with all their locations
+  const result = plantIds.map(plantId => {
+    const plantDef = indoorPlantDefinitions[plantId];
+    const allLocations = indoorSheet2.filter(loc => loc['Plant ID'] === plantId);
+    
+    // Calculate total quantity
+    const totalQuantity = allLocations.reduce((sum, loc) => {
+      return sum + (parseInt(loc['Quantity']) || 0);
+    }, 0);
+
+    return {
+      ...plantDef,
+      Locations: allLocations,
+      Quantity: totalQuantity
+    };
+  });
+
+  res.json(result);
+});
+
+// GET /api/locations/:locationNumber/outdoor-plants
+router.get('/:locationNumber/outdoor-plants', (req, res) => {
+  const locationNumber = req.params.locationNumber;
+
+  // Filter location entries for this specific location
+  const locationsForPlants = outdoorSheet2.filter(p => p['Location number'] === locationNumber);
+
+  // Get unique plant IDs
+  const plantIds = [...new Set(locationsForPlants.map(p => p['Plant ID']))];
+
+  // Get full plant data with all their locations
+  const result = plantIds.map(plantId => {
+    const plantDef = outdoorPlantDefinitions[plantId];
+    const allLocations = outdoorSheet2.filter(loc => loc['Plant ID'] === plantId);
+
+    return {
+      ...plantDef,
+      Locations: allLocations
+    };
+  });
+
+  res.json(result);
+});
+
 // Dynamic endpoints for each location type
 const locationTypes = [
   'Building', 'Gate', 'Roadside', 'Residential',
@@ -66,18 +129,3 @@ locationTypes.forEach(type => {
 });
 
 module.exports = router;
-
-
-// GET /api/locations/:locationNumber/indoor-plants
-router.get('/:locationNumber/indoor-plants', (req, res) => {
-  const locationNumber = req.params.locationNumber;
-
-  const filtered = sheet2
-    .filter(p => p['Location number'] === locationNumber)
-    .map(p => ({
-      ...plantDefinitions[p['Plant ID']],
-      ...p
-    }));
-
-  res.json(filtered);
-});
