@@ -1,13 +1,14 @@
 {
   "name": "uoblandscapes-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "University of Bahrain Landscape API",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["landscape", "plants", "uob"],
+  "author": "University of Bahrain",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
