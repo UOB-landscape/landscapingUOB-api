@@ -4,7 +4,7 @@ const xlsx = require('xlsx');
 const path = require('path');
 
 // Load the Excel file
-const workbook = xlsx.readFile(path.join(__dirname, '../data/Reports Images (1).xlsx'));
+const workbook = xlsx.readFile(path.join(__dirname, '../data/Reports Images.xlsx'));
 const sheetName = workbook.SheetNames[0];
 const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 

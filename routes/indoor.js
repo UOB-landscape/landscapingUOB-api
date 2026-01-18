@@ -4,7 +4,7 @@ const xlsx = require('xlsx');
 const path = require('path');
 
 // Load both sheets from the Excel file
-const workbook = xlsx.readFile(path.join(__dirname, '../data/Indoor plants (1).xlsx'));
+const workbook = xlsx.readFile(path.join(__dirname, '../data/Indoor plants.xlsx'));
 const sheet1 = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 const sheet2 = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]]);
 

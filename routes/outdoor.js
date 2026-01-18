@@ -4,7 +4,7 @@ const xlsx = require('xlsx');
 const path = require('path');
 
 // Load both sheets from the Excel file
-const workbook = xlsx.readFile(path.join(__dirname, '../data/Outdoor plants (2).xlsx'));
+const workbook = xlsx.readFile(path.join(__dirname, '../data/Outdoor plants.xlsx'));
 
 // First sheet: Plant data
 const firstSheetName = workbook.SheetNames[0];

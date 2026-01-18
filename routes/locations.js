@@ -4,7 +4,7 @@ const xlsx = require('xlsx');
 const path = require('path');
 
 // Load all sheets from the Locations Excel file
-const workbook = xlsx.readFile(path.join(__dirname, '../data/Locations 1 (3).xlsx'));
+const workbook = xlsx.readFile(path.join(__dirname, '../data/Locations.xlsx'));
 const sheetNames = workbook.SheetNames;
 
 const locationData = sheetNames.flatMap(sheetName =>
@@ -12,12 +12,12 @@ const locationData = sheetNames.flatMap(sheetName =>
 );
 
 // Load both sheets from Indoor plants file
-const indoorWorkbook = xlsx.readFile(path.join(__dirname, '../data/Indoor plants (1).xlsx'));
+const indoorWorkbook = xlsx.readFile(path.join(__dirname, '../data/Indoor plants.xlsx'));
 const indoorSheet1 = xlsx.utils.sheet_to_json(indoorWorkbook.Sheets[indoorWorkbook.SheetNames[0]]);
 const indoorSheet2 = xlsx.utils.sheet_to_json(indoorWorkbook.Sheets[indoorWorkbook.SheetNames[1]]);
 
 // Load both sheets from Outdoor plants file
-const outdoorWorkbook = xlsx.readFile(path.join(__dirname, '../data/Outdoor plants (2).xlsx'));
+const outdoorWorkbook = xlsx.readFile(path.join(__dirname, '../data/Outdoor plants.xlsx'));
 const outdoorSheet1 = xlsx.utils.sheet_to_json(outdoorWorkbook.Sheets[outdoorWorkbook.SheetNames[0]]);
 const outdoorSheet2 = xlsx.utils.sheet_to_json(outdoorWorkbook.Sheets[outdoorWorkbook.SheetNames[1]]);
 
