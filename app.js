@@ -7,6 +7,22 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
+// Welcome route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'UOB Landscape API is running! 🌿',
+    endpoints: {
+      indoorPlants: '/api/indoor-plants',
+      outdoorPlants: '/api/outdoor-plants',
+      locations: '/api/locations',
+      creators: '/api/creators',
+      proposals: '/api/proposals',
+      beforeAfter: '/api/before-after',
+      reportImages: '/api/reportImages'
+    }
+  });
+});
+
 // Modular route imports
 app.use('/api/indoor-plants', require('./routes/indoor'));
 app.use('/api/outdoor-plants', require('./routes/outdoor'));
