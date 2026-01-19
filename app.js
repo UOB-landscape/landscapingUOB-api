@@ -18,7 +18,8 @@ app.get('/', (req, res) => {
       creators: '/api/creators',
       proposals: '/api/proposals',
       beforeAfter: '/api/before-after',
-      reportImages: '/api/reportImages'
+      reportImages: '/api/reportImages',
+      reports: '/api/reports'
     }
   });
 });
@@ -30,6 +31,7 @@ app.use('/api/locations', require('./routes/locations'));
 app.use('/api/creators', require('./routes/creators'));
 app.use('/api/proposals', require('./routes/proposals'));
 app.use('/api/before-after', require('./routes/BeforeAndAfter'));
+app.use('/api/reports', require('./routes/reports'));
 
 // Report images route
 app.use('/api/reportImages', require('./routes/reportImages'));
