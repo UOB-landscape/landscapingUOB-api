@@ -62,11 +62,18 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/locations/:locationNumber/indoor-plants
+// Now accepts optional query parameter: ?type=Building
 router.get('/:locationNumber/indoor-plants', (req, res) => {
   const locationNumber = req.params.locationNumber;
+  const locationType = req.query.type; // Optional: filter by location type
 
   // Filter location entries for this specific location
-  const locationsForPlants = indoorSheet2.filter(p => p['Location number'] === locationNumber);
+  let locationsForPlants = indoorSheet2.filter(p => p['Location number'] === locationNumber);
+
+  // If location type is specified, filter by that too
+  if (locationType) {
+    locationsForPlants = locationsForPlants.filter(p => p['Location type'] === locationType);
+  }
 
   // Get unique plant IDs
   const plantIds = [...new Set(locationsForPlants.map(p => p['Plant ID']))];
@@ -74,7 +81,13 @@ router.get('/:locationNumber/indoor-plants', (req, res) => {
   // Get full plant data with all their locations
   const result = plantIds.map(plantId => {
     const plantDef = indoorPlantDefinitions[plantId];
-    const allLocations = indoorSheet2.filter(loc => loc['Plant ID'] === plantId);
+    
+    // Get all locations for this plant (filtered by number and optionally type)
+    let allLocations = indoorSheet2.filter(loc => {
+      if (loc['Plant ID'] !== plantId) return false;
+      if (locationType && loc['Location type'] !== locationType) return false;
+      return true;
+    });
     
     // Calculate total quantity
     const totalQuantity = allLocations.reduce((sum, loc) => {
@@ -92,11 +105,18 @@ router.get('/:locationNumber/indoor-plants', (req, res) => {
 });
 
 // GET /api/locations/:locationNumber/outdoor-plants
+// Now accepts optional query parameter: ?type=Building
 router.get('/:locationNumber/outdoor-plants', (req, res) => {
   const locationNumber = req.params.locationNumber;
+  const locationType = req.query.type; // Optional: filter by location type
 
   // Filter location entries for this specific location
-  const locationsForPlants = outdoorSheet2.filter(p => p['Location number'] === locationNumber);
+  let locationsForPlants = outdoorSheet2.filter(p => p['Location number'] === locationNumber);
+
+  // If location type is specified, filter by that too
+  if (locationType) {
+    locationsForPlants = locationsForPlants.filter(p => p['Location type'] === locationType);
+  }
 
   // Get unique plant IDs
   const plantIds = [...new Set(locationsForPlants.map(p => p['Plant ID']))];
@@ -104,7 +124,13 @@ router.get('/:locationNumber/outdoor-plants', (req, res) => {
   // Get full plant data with all their locations
   const result = plantIds.map(plantId => {
     const plantDef = outdoorPlantDefinitions[plantId];
-    const allLocations = outdoorSheet2.filter(loc => loc['Plant ID'] === plantId);
+    
+    // Get all locations for this plant (filtered by number and optionally type)
+    let allLocations = outdoorSheet2.filter(loc => {
+      if (loc['Plant ID'] !== plantId) return false;
+      if (locationType && loc['Location type'] !== locationType) return false;
+      return true;
+    });
 
     return {
       ...plantDef,
