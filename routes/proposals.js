@@ -3,13 +3,9 @@ const router = express.Router();
 const xlsx = require('xlsx');
 const path = require('path');
 
-// Load all sheets from Proposals.xlsx
+// Load proposals from Excel file
 const workbook = xlsx.readFile(path.join(__dirname, '../data/Proposals.xlsx'));
-const sheetNames = workbook.SheetNames;
-
-const proposalsData = sheetNames.flatMap(sheetName =>
-  xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
-);
+const proposalsData = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 
 // GET /api/proposals
 router.get('/', (req, res) => {

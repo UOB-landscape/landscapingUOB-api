@@ -67,36 +67,35 @@ router.get('/:locationNumber/indoor-plants', (req, res) => {
   const locationNumber = req.params.locationNumber;
   const locationType = req.query.type; // Optional: filter by location type
 
-  // Filter location entries for this specific location
+  // Filter location entries for this specific location number
   let locationsForPlants = indoorSheet2.filter(p => p['Location number'] === locationNumber);
 
   // If location type is specified, filter by that too
   if (locationType) {
-    locationsForPlants = locationsForPlants.filter(p => p['Location type'] === locationType);
+    locationsForPlants = locationsForPlants.filter(p => {
+      const pType = (p['Location type'] || '').trim();
+      return pType === locationType;
+    });
   }
 
   // Get unique plant IDs
   const plantIds = [...new Set(locationsForPlants.map(p => p['Plant ID']))];
 
-  // Get full plant data with all their locations
+  // Get full plant data
   const result = plantIds.map(plantId => {
     const plantDef = indoorPlantDefinitions[plantId];
     
-    // Get all locations for this plant (filtered by number and optionally type)
-    let allLocations = indoorSheet2.filter(loc => {
-      if (loc['Plant ID'] !== plantId) return false;
-      if (locationType && loc['Location type'] !== locationType) return false;
-      return true;
-    });
+    // Get all location entries for this plant that match the filter
+    let plantLocations = locationsForPlants.filter(loc => loc['Plant ID'] === plantId);
     
-    // Calculate total quantity
-    const totalQuantity = allLocations.reduce((sum, loc) => {
+    // Calculate total quantity for this specific location
+    const totalQuantity = plantLocations.reduce((sum, loc) => {
       return sum + (parseInt(loc['Quantity']) || 0);
     }, 0);
 
     return {
       ...plantDef,
-      Locations: allLocations,
+      Locations: plantLocations,
       Quantity: totalQuantity
     };
   });
@@ -110,31 +109,36 @@ router.get('/:locationNumber/outdoor-plants', (req, res) => {
   const locationNumber = req.params.locationNumber;
   const locationType = req.query.type; // Optional: filter by location type
 
-  // Filter location entries for this specific location
+  // Filter location entries for this specific location number
   let locationsForPlants = outdoorSheet2.filter(p => p['Location number'] === locationNumber);
 
   // If location type is specified, filter by that too
   if (locationType) {
-    locationsForPlants = locationsForPlants.filter(p => p['Location type'] === locationType);
+    locationsForPlants = locationsForPlants.filter(p => {
+      const pType = (p['Location type'] || '').trim();
+      return pType === locationType;
+    });
   }
 
-  // Get unique plant IDs
-  const plantIds = [...new Set(locationsForPlants.map(p => p['Plant ID']))];
+  // Get unique plant IDs (outdoor uses 'Plants categories' as the plant identifier)
+  const plantIds = [...new Set(locationsForPlants.map(p => p['Plants categories']))].filter(Boolean);
 
-  // Get full plant data with all their locations
+  // Get full plant data
   const result = plantIds.map(plantId => {
     const plantDef = outdoorPlantDefinitions[plantId];
     
-    // Get all locations for this plant (filtered by number and optionally type)
-    let allLocations = outdoorSheet2.filter(loc => {
-      if (loc['Plant ID'] !== plantId) return false;
-      if (locationType && loc['Location type'] !== locationType) return false;
-      return true;
-    });
+    // Get all location entries for this plant that match the filter
+    let plantLocations = locationsForPlants.filter(loc => loc['Plants categories'] === plantId);
+    
+    // Calculate total quantity for this specific location
+    const totalQuantity = plantLocations.reduce((sum, loc) => {
+      return sum + (parseInt(loc['Quantity']) || 0);
+    }, 0);
 
     return {
       ...plantDef,
-      Locations: allLocations
+      Locations: plantLocations,
+      Quantity: totalQuantity
     };
   });
 
